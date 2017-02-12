@@ -12,8 +12,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Flocking");
-        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setTitle("Flocking Simulator");
+        primaryStage.setScene(new Scene(root, 752, 620));
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(e -> Platform.exit());

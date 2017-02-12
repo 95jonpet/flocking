@@ -13,7 +13,7 @@ import java.util.List;
  * @author Peter Jonsson <95jonpet@gmail.com>
  */
 public class FlockingSimulation {
-    static final int SIZE = 1024;
+    static final int SIZE = 512;
     static final int STEPS = 100;
 
     List<Agent> agents;
@@ -46,6 +46,7 @@ public class FlockingSimulation {
 
     /**
      * Run the entire simulation.
+     * This could be done on a separate thread.
      */
     public void run() {
         if (finished || running)

@@ -2,21 +2,19 @@ package sample;
 
 import javafx.application.Platform;
 import javafx.scene.Parent;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
+import javafx.scene.image.ImageView;
 
 public class Controller {
     private FlockingSimulation simulation;
-    private Parent root;
-    private Canvas canvas;
+    private ImageView imageView;
 
     public Controller(Parent root) {
-        this.root = root;
-        canvas = (Canvas) root.lookup("#canvas");
-        canvas.setWidth(FlockingSimulation.SIZE);
-        canvas.setHeight(FlockingSimulation.SIZE);
+        imageView = (ImageView) root.lookup("#imageview");
+        System.out.println(imageView);
+        //imageView.prefWidth(FlockingSimulation.SIZE);
+        //imageView.prefHeight(FlockingSimulation.SIZE);
 
         simulation = new FlockingSimulation(42);
 
@@ -24,18 +22,17 @@ public class Controller {
             simulation.run();
 
             Image img = simulation.getFrame(FlockingSimulation.STEPS - 1).getImage();
-            canvas.getGraphicsContext2D().drawImage(img, 0, 0);
+            imageView.setImage(img);
         });
-    }
 
-    private void render() {
-        GraphicsContext context = canvas.getGraphicsContext2D();
-
-        // Clear canvas with white
-        context.setFill(Color.WHITE);
-        context.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        simulation.render(context);
+        Slider slider = (Slider) root.lookup("#slider");
+        slider.setMin(0);
+        slider.setMax(FlockingSimulation.STEPS - 1);
+        slider.setValue(0);
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Image img = simulation.getFrame((int) Math.floor((double) newValue)).getImage();
+            imageView.setImage(img);
+        });
     }
 
 }
