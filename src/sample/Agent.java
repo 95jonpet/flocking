@@ -18,7 +18,7 @@ public class Agent {
     /**
      * Maximum distance to apply alignment force to.
      */
-    private static final int MAX_ALIGNMENT_DISTANCE = 256; //Integer.MAX_VALUE;
+    private static final int MAX_ALIGNMENT_DISTANCE = 128 / 2; //Integer.MAX_VALUE;
 
     /**
      * Minimum distance to apply cohesion force to.
@@ -28,7 +28,7 @@ public class Agent {
     /**
      * Maximum distance to apply separation force to.
      */
-    private static final int MAX_SEPARATION_DISTANCE = 32; //Integer.MAX_VALUE;
+    private static final int MAX_SEPARATION_DISTANCE = 16; //Integer.MAX_VALUE;
 
     private List<Agent> agents;
     private Vector2D position;

@@ -1,8 +1,10 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Controller {
@@ -16,22 +18,14 @@ public class Controller {
         canvas.setWidth(FlockingSimulation.SIZE);
         canvas.setHeight(FlockingSimulation.SIZE);
 
-        simulation = new FlockingSimulation(10);
+        simulation = new FlockingSimulation(42);
 
-        render();
+        Platform.runLater(() -> {
+            simulation.run();
 
-        new Thread(() -> {
-            for (int i = 0; i < 100; i++) {
-                simulation.update();
-                render();
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+            Image img = simulation.getFrame(FlockingSimulation.STEPS - 1).getImage();
+            canvas.getGraphicsContext2D().drawImage(img, 0, 0);
+        });
     }
 
     private void render() {

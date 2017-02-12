@@ -14,8 +14,12 @@ import java.util.List;
  */
 public class FlockingSimulation {
     static final int SIZE = 1024;
+    static final int STEPS = 100;
 
     List<Agent> agents;
+    private volatile boolean finished = false;
+    private volatile boolean running = false;
+    final SimulationFrame[] frame = new SimulationFrame[STEPS];
 
     /**
      * Creates a new flocking simulation.
@@ -23,10 +27,40 @@ public class FlockingSimulation {
     public FlockingSimulation(int numberOfAgents) {
         this.agents = new ArrayList<>();
 
+        // Set up initial state
+        // TODO Make more effective
         for (int i = 0; i < numberOfAgents; i++) {
             int position = (int) Math.floor(i * (Math.pow(SIZE, 2) / numberOfAgents));
             addAgent(position / SIZE, position % SIZE);
         }
+    }
+
+    /**
+     * Gets a specific simulation frame.
+     * @param index Frame index.
+     * @return Requested simulation frame.
+     */
+    public SimulationFrame getFrame(final int index) {
+        return frame[index];
+    }
+
+    /**
+     * Run the entire simulation.
+     */
+    public void run() {
+        if (finished || running)
+            return;
+
+        running = true;
+
+        // Simulate steps as frames
+        for (int i = 0; i < STEPS; i++) {
+            update();
+            frame[i] = new SimulationFrame(SIZE, agents);
+        }
+
+        running = false;
+        finished = true;
     }
 
     /**
