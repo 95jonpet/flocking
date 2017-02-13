@@ -22,7 +22,7 @@ class SimulationFrame {
      */
     SimulationFrame(final List<Agent> agents) {
         image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = image.createGraphics();
+        Graphics2D graphics = image.createGraphics();
 
         // Clear graphics
         graphics.setColor(Color.WHITE);
@@ -32,7 +32,7 @@ class SimulationFrame {
 
         // Render all agents.
         for (Agent agent : agents) {
-            graphics.fillOval(Math.round((int) agent.getX()), Math.round((int) agent.getY()), 5, 5);
+            agent.render(graphics);
         }
 
         graphics.dispose();

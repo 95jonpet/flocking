@@ -2,6 +2,8 @@ package se.peterjonsson.flocking;
 
 import math.geom2d.Vector2D;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.List;
 
 /**
@@ -54,6 +56,16 @@ class Agent {
     private Vector2D direction;
 
     /**
+     * The x points used for rendering the agent.
+     */
+    private final int[] xPoints = new int[] { 0, 5, 10};
+
+    /**
+     * The y points used for rendering the agent.
+     */
+    private final int[] yPoints = new int[] { 10, 0, 10 };
+
+    /**
      * Creates a new agent.
      * @param x Horizontal position.
      * @param y Vertical position.
@@ -87,6 +99,32 @@ class Agent {
         resultant = resultant.normalize().times(SPEED); // Normalize
         position = position.plus(resultant);
         direction = resultant.normalize();
+    }
+
+    /**
+     * Renders the agent onto a graphics object.
+     * @param graphics Canvas to render onto.
+     */
+    void render(Graphics2D graphics) {
+        AffineTransform at = new AffineTransform();
+        Dimension size = getTriangleSize();
+
+        int x = (int) Math.round(getX());
+        int y = (int) Math.round(getY());
+        double angle = direction.angle() + Math.PI / 2;
+
+        at.translate(x, y);
+        at.rotate(angle, size.width / 2, size.height / 2);
+
+        graphics.setTransform(at);
+        graphics.setColor(Color.BLUE);
+        graphics.drawPolygon(xPoints, yPoints, 3);
+
+        // Guide
+        graphics.setColor(Color.RED);
+        graphics.drawLine(size.width / 2, 0, size.width / 2, size.height / 2);
+
+        graphics.setTransform(new AffineTransform());
     }
 
     /**
@@ -189,6 +227,25 @@ class Agent {
     @SuppressWarnings("unused")
     public void kill() {
         agents.remove(this);
+    }
+
+    /**
+     * Gets the size of the triangle used to render the agent.
+     * @return Dimensions for rendering a triangle.
+     */
+    private Dimension getTriangleSize() {
+        int maxX = 0;
+        int maxY = 0;
+
+        for (int xPoint : xPoints) {
+            maxX = Math.max(maxX, xPoint);
+        }
+
+        for (int yPoint : yPoints) {
+            maxY = Math.max(maxY, yPoint);
+        }
+
+        return new Dimension(maxX, maxY);
     }
 
 }
