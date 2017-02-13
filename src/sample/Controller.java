@@ -12,7 +12,6 @@ public class Controller {
 
     public Controller(Parent root) {
         imageView = (ImageView) root.lookup("#imageview");
-        System.out.println(imageView);
         //imageView.prefWidth(FlockingSimulation.SIZE);
         //imageView.prefHeight(FlockingSimulation.SIZE);
 

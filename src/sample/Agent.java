@@ -57,6 +57,14 @@ public class Agent {
         resultant = resultant.plus(alignmentVector());
         resultant = resultant.plus(cohesionVector());
 
+        if (distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2) >= FlockingSimulation.SIZE * (2.0 / 6.0)) {
+            Vector2D restraintVector = new Vector2D(
+                    FlockingSimulation.SIZE / 2 - getX(),
+                    FlockingSimulation.SIZE / 2 - getY()
+            ).normalize().times(0.2);
+            resultant = resultant.plus(restraintVector);
+        }
+
         resultant = resultant.normalize().times(SPEED); // Normalize
         position = position.plus(resultant);
         direction = resultant.normalize();
@@ -122,6 +130,8 @@ public class Agent {
     private Vector2D separationVector() {
         Vector2D separation = new Vector2D();
 
+        // TODO Base on the nearest other agent instead of flock center
+
         for (Agent agent : agents) {
             if (agent != this && distanceToAgent(agent) <= MAX_SEPARATION_DISTANCE) {
                 separation = separation.plus(new Vector2D(agent.getX() - getX(), agent.getY() - getY()));
@@ -141,10 +151,17 @@ public class Agent {
      * @return Distance to the specified agent.
      */
     private double distanceToAgent(Agent agent) {
-        double dx = position.x() - agent.position.x();
-        double dy = position.y() - agent.position.y();
+        return distanceToPoint(agent.getX(), agent.getY());
+    }
 
-        return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    /**
+     * Gets the distance to a point.
+     * @param x Horizontal coordinate.
+     * @param y Vertical coordinate.
+     * @return Distance to the specified point.
+     */
+    private double distanceToPoint(final double x, final double y) {
+        return Math.sqrt(Math.pow(getX() - x, 2) + Math.pow(getY() - y, 2));
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class FlockingSimulation {
     static final int SIZE = 512;
-    static final int STEPS = 100;
+    static final int STEPS = 1000;
 
     List<Agent> agents;
     private volatile boolean finished = false;
