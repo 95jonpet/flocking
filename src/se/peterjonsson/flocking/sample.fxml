@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="752.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+       <MenuBar BorderPane.alignment="CENTER">
+           <Menu mnemonicParsing="false" text="File">
+               <MenuItem mnemonicParsing="false" text="Close"/>
+           </Menu>
+           <Menu mnemonicParsing="false" text="Edit">
+               <MenuItem mnemonicParsing="false" text="Delete"/>
+           </Menu>
+           <Menu mnemonicParsing="false" text="Help">
+               <MenuItem mnemonicParsing="false" text="About"/>
+           </Menu>
+       </MenuBar>
+   </top>
+   <left>
+      <ListView fx:id="sidebar" prefHeight="200.0" prefWidth="240.0" style="-fx-background-color: #222222;" BorderPane.alignment="CENTER" />
+   </left>
+   <center>
+       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+           <ImageView fx:id="imageView" fitHeight="512.0" fitWidth="512.0" pickOnBounds="true" preserveRatio="true"/>
+           <HBox prefHeight="22.0" prefWidth="400.0">
+               <Slider fx:id="slider" prefHeight="40.0" prefWidth="512.0">
+                   <HBox.margin>
+                       <Insets top="20.0"/>
+                   </HBox.margin>
+               </Slider>
+           </HBox>
+       </VBox>
+   </center>
+   <bottom>
+       <HBox prefHeight="13.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+           <Label text="Status" textFill="#9f9f9f"/>
+       </HBox>
+   </bottom>
+</BorderPane>

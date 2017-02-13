@@ -1,6 +1,7 @@
-package sample;
+package se.peterjonsson.flocking;
 
 import math.geom2d.Vector2D;
+
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  *
  * @author Peter Jonsson <95jonpet@gmail.com>
  */
-public class Agent {
+class Agent {
 
     /**
      * Distance the agent moves in one step/update.
@@ -18,20 +19,38 @@ public class Agent {
     /**
      * Maximum distance to apply alignment force to.
      */
-    private static final int MAX_ALIGNMENT_DISTANCE = 128 / 2; //Integer.MAX_VALUE;
+    private static final int MAX_ALIGNMENT_DISTANCE = 128 / 2;
 
     /**
      * Minimum distance to apply cohesion force to.
      */
-    private static final int MIN_COHESION_DISTANCE = 16; //Integer.MAX_VALUE;
+    private static final int MIN_COHESION_DISTANCE = 16;
+
+    /**
+     * Maximum distance to apply cohesion force to.
+     */
+    private static final int MAX_COHESION_DISTANCE = 64;
 
     /**
      * Maximum distance to apply separation force to.
      */
-    private static final int MAX_SEPARATION_DISTANCE = 16; //Integer.MAX_VALUE;
+    private static final int MAX_SEPARATION_DISTANCE = 16;
 
-    private List<Agent> agents;
+    /**
+     * List of all agents in the simulation.
+     * This should include the current agent.
+     */
+    private final List<Agent> agents;
+
+    /**
+     * Current agent position.
+     */
     private Vector2D position;
+
+    /**
+     * Normalized vector of the last force applied to the agent.
+     * Use {@link Vector2D#angle()} to find the actual angle of this force.
+     */
     private Vector2D direction;
 
     /**
@@ -40,7 +59,7 @@ public class Agent {
      * @param y Vertical position.
      * @param agents List of all agents.
      */
-    public Agent(int x, int y, List<Agent> agents) {
+    Agent(int x, int y, List<Agent> agents) {
         this.agents = agents;
 
         position = new Vector2D(x, y);
@@ -50,10 +69,10 @@ public class Agent {
     /**
      * Updates the agent by stepping forward one step of the simulation.
      */
-    public void update() {
+    void update() {
         Vector2D resultant = direction;
 
-        resultant = resultant.plus(separationVector());
+        resultant = resultant.plus(separationVector().times(3));
         resultant = resultant.plus(alignmentVector());
         resultant = resultant.plus(cohesionVector());
 
@@ -74,7 +93,7 @@ public class Agent {
      * Gets the horizontal position of the agent.
      * @return Horizontal coordinate.
      */
-    public double getX() {
+    double getX() {
         return position.x();
     }
 
@@ -82,7 +101,7 @@ public class Agent {
      * Gets the vertical position of the agent.
      * @return Vertical coordinate.
      */
-    public double getY() {
+    double getY() {
         return position.y();
     }
 
@@ -94,7 +113,8 @@ public class Agent {
         Vector2D cohesion = new Vector2D();
 
         for (Agent agent : agents) {
-            if (agent != this && distanceToAgent(agent) >= MIN_COHESION_DISTANCE) {
+            double distance = distanceToAgent(agent);
+            if (agent != this && distance >= MIN_COHESION_DISTANCE && distance <= MAX_COHESION_DISTANCE) {
                 cohesion = cohesion.plus(new Vector2D(agent.getX() - getX(), agent.getY() - getY()));
             }
         }
@@ -128,13 +148,11 @@ public class Agent {
      * @return Normalized vector pointing away from the closest agent.
      */
     private Vector2D separationVector() {
-        Vector2D separation = new Vector2D();
-
-        // TODO Base on the nearest other agent instead of flock center
+        Vector2D separation = new Vector2D(0, 0);
 
         for (Agent agent : agents) {
             if (agent != this && distanceToAgent(agent) <= MAX_SEPARATION_DISTANCE) {
-                separation = separation.plus(new Vector2D(agent.getX() - getX(), agent.getY() - getY()));
+                separation = separation.plus(new Vector2D(getX() - agent.getX(), getY() - agent.getY()));
             }
         }
 
@@ -142,7 +160,7 @@ public class Agent {
             separation = separation.normalize();
         }
 
-        return separation.opposite();
+        return separation;
     }
 
     /**
@@ -168,6 +186,7 @@ public class Agent {
      * Kills the agent.
      * This removes it from the shared list of agents.
      */
+    @SuppressWarnings("unused")
     public void kill() {
         agents.remove(this);
     }

@@ -1,4 +1,4 @@
-package sample;
+package se.peterjonsson.flocking;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -7,6 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * The starting point of the application.
+ * Creates a new main view.
+ */
 public class Main extends Application {
 
     @Override
@@ -17,11 +21,17 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(e -> Platform.exit());
+        primaryStage.requestFocus();
 
-        new Controller(root);
+        new MainController(root);
     }
 
 
+    /**
+     * Called on application start.
+     * This launches the application and calls {@link #start(Stage)}.
+     * @param args Launch arguments. These are currently not used.
+     */
     public static void main(String[] args) {
         launch(args);
     }

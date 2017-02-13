@@ -1,8 +1,7 @@
-package sample;
+package se.peterjonsson.flocking;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +11,48 @@ import java.util.List;
  *
  * @author Peter Jonsson <95jonpet@gmail.com>
  */
-public class FlockingSimulation {
+class FlockingSimulation {
+
+    /**
+     * The horizontal and vertical size of the simulation.
+     */
     static final int SIZE = 512;
+
+    /**
+     * The number of steps to simulate.
+     */
     static final int STEPS = 1000;
 
-    List<Agent> agents;
+    /**
+     * List of all agents within the simulation.
+     */
+    private final List<Agent> agents;
+
+    /**
+     * Indicates if the simulation has finished or not.
+     */
     private volatile boolean finished = false;
+
+    /**
+     * Indicates if the simulation is currently running or not.
+     */
     private volatile boolean running = false;
-    final SimulationFrame[] frame = new SimulationFrame[STEPS];
+
+    /**
+     * Array of individual simulation frames for each step of the simulation.
+     */
+    private final SimulationFrame[] frame = new SimulationFrame[STEPS];
+
+    /**
+     * Property containing the current simulation progress.
+     * The value is between 0 and 1 inclusive.
+     */
+    final DoubleProperty progressProperty = new SimpleDoubleProperty(0);
 
     /**
      * Creates a new flocking simulation.
      */
-    public FlockingSimulation(int numberOfAgents) {
+    FlockingSimulation(final int numberOfAgents) {
         this.agents = new ArrayList<>();
 
         // Set up initial state
@@ -40,7 +68,7 @@ public class FlockingSimulation {
      * @param index Frame index.
      * @return Requested simulation frame.
      */
-    public SimulationFrame getFrame(final int index) {
+    SimulationFrame getFrame(final int index) {
         return frame[index];
     }
 
@@ -48,16 +76,19 @@ public class FlockingSimulation {
      * Run the entire simulation.
      * This could be done on a separate thread.
      */
-    public void run() {
+    void run() {
         if (finished || running)
             return;
 
         running = true;
+        progressProperty.set(0);
 
         // Simulate steps as frames
         for (int i = 0; i < STEPS; i++) {
             update();
-            frame[i] = new SimulationFrame(SIZE, agents);
+            frame[i] = new SimulationFrame(agents);
+
+            progressProperty.set((double) i / STEPS);
         }
 
         running = false;
@@ -67,21 +98,9 @@ public class FlockingSimulation {
     /**
      * Updates the simulation by stepping forward once.
      */
-    public void update() {
+    private void update() {
         for (Agent agent : agents) {
             agent.update();
-        }
-    }
-
-    /**
-     * Renders the simulation onto a {@link GraphicsContext} canvas.
-     * @param context Canvas to render onto.
-     */
-    public void render(GraphicsContext context) {
-        context.setFill(Color.BLUE); // Render agents in blue
-
-        for (Agent agent : agents) {
-            context.fillOval(agent.getX(), agent.getY(), 5, 5);
         }
     }
 
