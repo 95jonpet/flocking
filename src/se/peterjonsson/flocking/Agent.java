@@ -68,7 +68,7 @@ class Agent {
     /**
      * The y points used for rendering the agent.
      */
-    private final int[] yPoints = new int[] { 10, 0, 10 };
+    private final int[] yPoints = new int[] { 15, 0, 15 };
 
     /**
      * Creates a new agent.
@@ -106,16 +106,12 @@ class Agent {
         int y = (int) Math.round(getY());
         double angle = direction.angle() + Math.PI / 2;
 
-        at.translate(x, y);
+        at.translate(x - size.width / 2, y - size.height / 2);
         at.rotate(angle, size.width / 2, size.height / 2);
 
         graphics.setTransform(at);
         graphics.setColor(color);
-        graphics.drawPolygon(xPoints, yPoints, 3);
-
-        // Guide
-        graphics.setColor(Color.RED);
-        graphics.drawLine(size.width / 2, 0, size.width / 2, size.height / 2);
+        graphics.fillPolygon(xPoints, yPoints, 3);
 
         graphics.setTransform(new AffineTransform());
     }
