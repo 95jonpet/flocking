@@ -56,6 +56,11 @@ class Agent {
     private Vector2D direction;
 
     /**
+     * The color to use when drawing the agent.
+     */
+    private Color color = Color.BLUE;
+
+    /**
      * The x points used for rendering the agent.
      */
     private final int[] xPoints = new int[] { 0, 5, 10};
@@ -82,19 +87,7 @@ class Agent {
      * Updates the agent by stepping forward one step of the simulation.
      */
     void update() {
-        Vector2D resultant = direction;
-
-        resultant = resultant.plus(separationVector().times(3));
-        resultant = resultant.plus(alignmentVector());
-        resultant = resultant.plus(cohesionVector());
-
-        if (distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2) >= FlockingSimulation.SIZE * (2.0 / 6.0)) {
-            Vector2D restraintVector = new Vector2D(
-                    FlockingSimulation.SIZE / 2 - getX(),
-                    FlockingSimulation.SIZE / 2 - getY()
-            ).normalize().times(0.2);
-            resultant = resultant.plus(restraintVector);
-        }
+        Vector2D resultant = boidsVector(); // General boids vector
 
         resultant = resultant.normalize().times(SPEED); // Normalize
         position = position.plus(resultant);
@@ -117,7 +110,7 @@ class Agent {
         at.rotate(angle, size.width / 2, size.height / 2);
 
         graphics.setTransform(at);
-        graphics.setColor(Color.BLUE);
+        graphics.setColor(color);
         graphics.drawPolygon(xPoints, yPoints, 3);
 
         // Guide
@@ -199,6 +192,32 @@ class Agent {
         }
 
         return separation;
+    }
+
+    /**
+     * Gets the boids vector created by the three rules:
+     *  1. Separation
+     *  2. Alignment
+     *  3. Cohesion
+     * The vector is not normalized.
+     * @return Boids vector.
+     */
+    private Vector2D boidsVector() {
+        Vector2D resultant = direction;
+
+        resultant = resultant.plus(separationVector().times(3));
+        resultant = resultant.plus(alignmentVector());
+        resultant = resultant.plus(cohesionVector());
+
+        if (distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2) >= FlockingSimulation.SIZE * (2.0 / 6.0)) {
+            Vector2D restraintVector = new Vector2D(
+                    FlockingSimulation.SIZE / 2 - getX(),
+                    FlockingSimulation.SIZE / 2 - getY()
+            ).normalize().times(0.2);
+            resultant = resultant.plus(restraintVector);
+        }
+
+        return resultant;
     }
 
     /**
