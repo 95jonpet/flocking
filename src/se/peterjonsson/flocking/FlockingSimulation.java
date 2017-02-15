@@ -13,6 +13,8 @@ import java.util.List;
  */
 class FlockingSimulation {
 
+    static final CustomImageWriter IMAGE_WRITER = new CustomImageWriter();
+
     /**
      * The horizontal and vertical size of the simulation.
      */
@@ -98,6 +100,8 @@ class FlockingSimulation {
 
             progressProperty.set((double) i / STEPS);
         }
+
+        IMAGE_WRITER.waitForImages();
 
         running = false;
         finished = true;

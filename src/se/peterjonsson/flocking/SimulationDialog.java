@@ -75,7 +75,10 @@ class SimulationDialog {
         stage.requestFocus();
 
         new Thread(() -> {
+            long startTime = System.currentTimeMillis();
             simulation.run();
+            long totalTime = System.currentTimeMillis() - startTime;
+            System.out.println("Simulation time: " + totalTime / 1000 + " s");
             Platform.runLater(stage::close);
         }).start();
     }

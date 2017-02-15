@@ -19,7 +19,7 @@ class SimulationFrame {
     /**
      * Path to the stored image.
      */
-    private Path imagePath;
+    private final Path imagePath;
 
     /**
      * Creates a new simulation frame from an existing state.
@@ -27,7 +27,7 @@ class SimulationFrame {
      * @param agents List of agents in their state to take a snapshot of.
      */
     SimulationFrame(final int number, final List<Agent> agents, final List<Obstacle> obstacles) {
-        BufferedImage image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
+        final BufferedImage image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
         // Clear graphics
@@ -48,16 +48,16 @@ class SimulationFrame {
 
         graphics.dispose();
 
-        imagePath = FileSystems.getDefault().getPath("temp", number + ".png");
+        imagePath = FileSystems.getDefault().getPath("temp", number + ".jpg");
 
         try {
-            if (Files.notExists(imagePath.resolve(".."))) {
-                Files.createDirectories(imagePath);
+            if (Files.notExists(imagePath.getParent())) {
+                Files.createDirectories(imagePath.getParent());
             } else {
                 Files.deleteIfExists(imagePath);
             }
 
-            ImageIO.write(image, "png", imagePath.toFile());
+            FlockingSimulation.IMAGE_WRITER.writeImage(image, imagePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
