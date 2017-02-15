@@ -86,7 +86,7 @@ class FlockingSimulation {
         // Simulate steps as frames
         for (int i = 0; i < STEPS; i++) {
             update();
-            frame[i] = new SimulationFrame(agents);
+            frame[i] = new SimulationFrame(i, agents);
 
             progressProperty.set((double) i / STEPS);
         }

@@ -1,3 +1,4 @@
-out
+out/
+temp/
 .idea/artifacts/
 .idea/inspectionProfiles/

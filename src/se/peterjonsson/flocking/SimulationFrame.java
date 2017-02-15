@@ -2,8 +2,13 @@ package se.peterjonsson.flocking;
 
 import javafx.embed.swing.SwingFXUtils;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -12,16 +17,17 @@ import java.util.List;
 class SimulationFrame {
 
     /**
-     * Image containing a rendition of the simulation frame.
+     * Path to the stored image.
      */
-    private final BufferedImage image;
+    private Path imagePath;
 
     /**
      * Creates a new simulation frame from an existing state.
+     * @param number Step number in the simulation.
      * @param agents List of agents in their state to take a snapshot of.
      */
-    SimulationFrame(final List<Agent> agents) {
-        image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
+    SimulationFrame(final int number, final List<Agent> agents) {
+        BufferedImage image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
         // Clear graphics
@@ -36,6 +42,20 @@ class SimulationFrame {
         }
 
         graphics.dispose();
+
+        imagePath = FileSystems.getDefault().getPath("temp", number + ".png");
+
+        try {
+            if (Files.notExists(imagePath.resolve(".."))) {
+                Files.createDirectories(imagePath);
+            } else {
+                Files.deleteIfExists(imagePath);
+            }
+
+            ImageIO.write(image, "png", imagePath.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -43,7 +63,13 @@ class SimulationFrame {
      * @return Frame image.
      */
     javafx.scene.image.Image getImage() {
-        return SwingFXUtils.toFXImage(image, null);
+        try {
+            return SwingFXUtils.toFXImage(ImageIO.read(imagePath.toFile()), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

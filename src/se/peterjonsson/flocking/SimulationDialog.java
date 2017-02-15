@@ -65,7 +65,6 @@ class SimulationDialog {
         ImageView iconView = (ImageView) root.lookup("#icon");
         try {
             String path = getClass().getResource("clock.png").toURI().toString();
-            System.out.println(path);
             iconView.setImage(new Image(path));
         } catch (URISyntaxException e) {
             e.printStackTrace();
