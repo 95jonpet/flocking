@@ -29,6 +29,11 @@ class FlockingSimulation {
     private final List<Agent> agents;
 
     /**
+     * List of obstacles.
+     */
+    private final List<Obstacle> obstacles;
+
+    /**
      * Indicates if the simulation has finished or not.
      */
     private volatile boolean finished = false;
@@ -54,6 +59,9 @@ class FlockingSimulation {
      */
     FlockingSimulation(final int numberOfAgents) {
         this.agents = new ArrayList<>();
+        obstacles = new ArrayList<>();
+
+        obstacles.add(new Obstacle(SIZE / 2, SIZE / 2));
 
         // Set up initial state
         // TODO Make more effective
@@ -86,7 +94,7 @@ class FlockingSimulation {
         // Simulate steps as frames
         for (int i = 0; i < STEPS; i++) {
             update();
-            frame[i] = new SimulationFrame(i, agents);
+            frame[i] = new SimulationFrame(i, agents, obstacles);
 
             progressProperty.set((double) i / STEPS);
         }
@@ -110,6 +118,6 @@ class FlockingSimulation {
      * @param y Vertical starting position of the agent.
      */
     private void addAgent(int x, int y) {
-        agents.add(new Agent(x, y, agents));
+        agents.add(new Agent(x, y, agents, obstacles));
     }
 }

@@ -26,7 +26,7 @@ class SimulationFrame {
      * @param number Step number in the simulation.
      * @param agents List of agents in their state to take a snapshot of.
      */
-    SimulationFrame(final int number, final List<Agent> agents) {
+    SimulationFrame(final int number, final List<Agent> agents, final List<Obstacle> obstacles) {
         BufferedImage image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
@@ -35,6 +35,11 @@ class SimulationFrame {
         graphics.fillRect(0, 0, FlockingSimulation.SIZE, FlockingSimulation.SIZE);
 
         graphics.setColor(Color.BLUE); // Render agents in blue
+
+        // Render all obstacles
+        for (Obstacle obstacle : obstacles) {
+            obstacle.render(graphics);
+        }
 
         // Render all agents.
         for (Agent agent : agents) {
