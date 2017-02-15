@@ -19,7 +19,7 @@
        </MenuBar>
    </top>
    <left>
-      <ListView fx:id="sidebar" prefHeight="200.0" prefWidth="240.0" style="-fx-background-color: #222222;" BorderPane.alignment="CENTER" />
+      <ListView fx:id="sidebar" prefHeight="200.0" prefWidth="240.0" BorderPane.alignment="CENTER" />
    </left>
    <center>
        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
