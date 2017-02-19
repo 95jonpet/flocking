@@ -49,6 +49,14 @@ class MainController {
         @SuppressWarnings("unchecked")
         ListView<Path> sidebar = (ListView<Path>) root.lookup("#sidebar");
 
+        try {
+            if (Files.notExists(FileSystems.getDefault().getPath("simulations"))) {
+                Files.createDirectory(FileSystems.getDefault().getPath("simulations"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try (Stream<Path> stream = Files.list(FileSystems.getDefault().getPath("simulations"))) {
             Iterator<Path> iterator = stream.iterator();
             while (iterator.hasNext()) {
