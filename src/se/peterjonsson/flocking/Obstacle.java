@@ -1,5 +1,7 @@
 package se.peterjonsson.flocking;
 
+import javafx.geometry.Pos;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
@@ -36,11 +38,12 @@ class Obstacle {
     }
 
     /**
-     * Renders the obstacle.
+     * Renders an obstacle.
+     * @param position Obstacle position.
      * @param graphics Canvas to render onto.
      */
-    void render(Graphics2D graphics) {
-        Ellipse2D.Double circle = new Ellipse2D.Double(x - RADIUS, y - RADIUS, RADIUS * 2, RADIUS * 2);
+    static void render(Position position, Graphics2D graphics) {
+        Ellipse2D.Double circle = new Ellipse2D.Double(position.x - RADIUS, position.y - RADIUS, RADIUS * 2, RADIUS * 2);
         graphics.setColor(Color.BLACK);
         graphics.fill(circle);
     }

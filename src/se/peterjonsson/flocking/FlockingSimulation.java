@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -96,7 +97,18 @@ class FlockingSimulation {
         // Simulate steps as frames
         for (int i = 0; i < STEPS; i++) {
             update();
-            frame[i] = new SimulationFrame(i, agents, obstacles);
+
+            List<Position> agentList = new LinkedList<>();
+            for (Agent agent : agents) {
+                agentList.add(new Position(agent.getX(), agent.getY(), agent.getAngle()));
+            }
+
+            List<Position> obstacleList = new LinkedList<>();
+            for (Obstacle obstacle : obstacles) {
+                obstacleList.add(new Position(obstacle.x, obstacle.y));
+            }
+
+            frame[i] = new SimulationFrame(i, agentList, obstacleList);
 
             progressProperty.set((double) i / STEPS);
         }

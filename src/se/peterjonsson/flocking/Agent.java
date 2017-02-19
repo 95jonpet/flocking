@@ -63,17 +63,17 @@ class Agent {
     /**
      * The color to use when drawing the agent.
      */
-    private Color color = Color.BLUE;
+    private static Color color = Color.BLUE;
 
     /**
      * The x points used for rendering the agent.
      */
-    private final int[] xPoints = new int[] { 0, 5, 10};
+    private static final int[] xPoints = new int[] { 0, 5, 10};
 
     /**
      * The y points used for rendering the agent.
      */
-    private final int[] yPoints = new int[] { 15, 0, 15 };
+    private static final int[] yPoints = new int[] { 15, 0, 15 };
 
     /**
      * Creates a new agent.
@@ -116,16 +116,17 @@ class Agent {
     }
 
     /**
-     * Renders the agent onto a graphics object.
+     * Renders an agent onto a graphics object.
+     * @param position Position of the agent.
      * @param graphics Canvas to render onto.
      */
-    void render(Graphics2D graphics) {
+    static void render(Position position, Graphics2D graphics) {
         AffineTransform at = new AffineTransform();
         Dimension size = getTriangleSize();
 
-        int x = (int) Math.round(getX());
-        int y = (int) Math.round(getY());
-        double angle = direction.angle() + Math.PI / 2;
+        int x = (int) Math.round(position.x);
+        int y = (int) Math.round(position.y);
+        double angle = position.angle + Math.PI / 2;
 
         at.translate(x - size.width / 2, y - size.height / 2);
         at.rotate(angle, size.width / 2, size.height / 2);
@@ -151,6 +152,14 @@ class Agent {
      */
     double getY() {
         return position.y();
+    }
+
+    /**
+     * Gets the agent's angle in radians.
+     * @return Angle in radians.
+     */
+    double getAngle() {
+        return direction.angle();
     }
 
     /**
@@ -269,7 +278,7 @@ class Agent {
      * Gets the size of the triangle used to render the agent.
      * @return Dimensions for rendering a triangle.
      */
-    private Dimension getTriangleSize() {
+    private static Dimension getTriangleSize() {
         int maxX = 0;
         int maxY = 0;
 
@@ -283,5 +292,4 @@ class Agent {
 
         return new Dimension(maxX, maxY);
     }
-
 }
