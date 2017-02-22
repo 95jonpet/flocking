@@ -11,7 +11,7 @@ class Predator {
     /**
      * Distance the agent moves in one step/update.
      */
-    private static final int SPEED = 7;
+    private static final int SPEED = 6;
 
     /**
      * Distance to kill agents from.

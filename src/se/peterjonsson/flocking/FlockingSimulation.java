@@ -30,17 +30,17 @@ class FlockingSimulation {
     /**
      * List of all agents within the simulation.
      */
-    private final List<Agent> agents;
+    private final List<Agent> agents = new ArrayList<>();
 
     /**
      * List of obstacles.
      */
-    private final List<Obstacle> obstacles;
+    private final List<Obstacle> obstacles = new ArrayList<>();
 
     /**
      * List of predators.
      */
-    private final List<Predator> predators;
+    private final List<Predator> predators = new ArrayList<>();
 
     /**
      * Indicates if the simulation has finished or not.
@@ -67,12 +67,8 @@ class FlockingSimulation {
      * Creates a new flocking simulation.
      */
     FlockingSimulation(final int numberOfAgents) {
-        this.agents = new ArrayList<>();
-        obstacles = new ArrayList<>();
-        predators = new ArrayList<>();
-
-        //obstacles.add(new Obstacle(SIZE / 2, SIZE / 2));
-        predators.add(new Predator(SIZE / 2, SIZE / 2, agents, obstacles, predators));
+        //addObstacle(SIZE / 2, SIZE / 2);
+        addPredator(SIZE / 2, SIZE / 2);
 
         // Set up initial state
         // TODO Make more effective
@@ -154,6 +150,24 @@ class FlockingSimulation {
      * @param y Vertical starting position of the agent.
      */
     private void addAgent(int x, int y) {
-        agents.add(new Agent(x, y, agents, obstacles));
+        agents.add(new Agent(x, y, agents, obstacles, predators));
+    }
+
+    /**
+     * Adds an obstacle to the simulation.
+     * @param x Horizontal starting position of the obstacle.
+     * @param y Vertical starting position of the obstacle.
+     */
+    private void addObstacle(int x, int y) {
+        obstacles.add(new Obstacle(x, y));
+    }
+
+    /**
+     * Adds a predator to the simulation.
+     * @param x Horizontal starting position of the predator.
+     * @param y Vertical starting position of the predator.
+     */
+    private void addPredator(int x, int y) {
+        predators.add(new Predator(x, y, agents, obstacles, predators));
     }
 }

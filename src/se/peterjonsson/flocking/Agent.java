@@ -50,6 +50,11 @@ class Agent {
     private final List<Obstacle> obstacles;
 
     /**
+     * List of all predators that should be avoided.
+     */
+    private final List<Predator> predators;
+
+    /**
      * Current agent position.
      */
     private Vector2D position;
@@ -85,10 +90,13 @@ class Agent {
      * @param x Horizontal position.
      * @param y Vertical position.
      * @param agents List of all agents.
+     * @param obstacles List of all obstacles.
+     * @param predators List of all predators.
      */
-    Agent(int x, int y, List<Agent> agents, List<Obstacle> obstacles) {
+    Agent(int x, int y, List<Agent> agents, List<Obstacle> obstacles, List<Predator> predators) {
         this.agents = agents;
         this.obstacles = obstacles;
+        this.predators = predators;
 
         position = new Vector2D(x, y);
         direction = new Vector2D(x, y).normalize();
@@ -100,20 +108,15 @@ class Agent {
     void update() {
         Vector2D resultant = boidsVector(); // General boids vector
 
-        Vector2D obstacleVector = new Vector2D(0, 0);
-        for (Obstacle obstacle : obstacles) {
-            if (distanceToPoint(obstacle.x, obstacle.y) <= Obstacle.RADIUS * 1.5) {
-                Vector2D v = new Vector2D(getX() - obstacle.x, getY() - obstacle.y)
-                        .normalize()
-                        .rotate(-Math.PI / 2)
-                        .times(Obstacle.RADIUS * 1.5);
-
-                obstacleVector = obstacleVector.plus(new Vector2D(v.getX() - getX(), v.getY() - getY()));
-                // TODO Aim for point along the normal vector
-            }
-        }
+        // Avoid obstacles
+        Vector2D obstacleVector = obstacleVector();
         if (obstacleVector.getX() != 0 && obstacleVector.getY() != 0)
             resultant = resultant.plus(obstacleVector.normalize().times(3));
+
+        // Avoid predators
+        Vector2D predatorVector = predatorVector();
+        if (predatorVector.getX() != 0 && predatorVector.getY() != 0)
+            resultant = resultant.plus(predatorVector.normalize().times(3));
 
         resultant = resultant.normalize().times(SPEED); // Normalize
         position = position.plus(resultant);
@@ -223,6 +226,42 @@ class Agent {
         }
 
         return separation;
+    }
+
+    /**
+     * Gets a vector for avoiding obstacles.
+     * @return Vector pointing away from nearby obstacles.
+     */
+    private Vector2D obstacleVector() {
+        Vector2D vector = new Vector2D(0, 0);
+        for (Obstacle obstacle : obstacles) {
+            if (distanceToPoint(obstacle.x, obstacle.y) <= Obstacle.RADIUS * 1.5) {
+                Vector2D v = new Vector2D(getX() - obstacle.x, getY() - obstacle.y)
+                        .normalize()
+                        .rotate(-Math.PI / 2)
+                        .times(Obstacle.RADIUS * 1.5);
+
+                vector = vector.plus(new Vector2D(v.getX() - getX(), v.getY() - getY()));
+                // TODO Aim for point along the normal vector
+            }
+        }
+
+        return vector;
+    }
+
+    /**
+     * Gets a vector for avoiding predators.
+     * @return Vector pointing away from nearby predators.
+     */
+    private Vector2D predatorVector() {
+        Vector2D vector = new Vector2D(0, 0);
+        for (Predator predator : predators) {
+            if (distanceToPoint(predator.getX(), predator.getY()) <= MAX_ALIGNMENT_DISTANCE) {
+                vector = vector.plus(new Vector2D(getX() - predator.getX(), getY() - predator.getY()));
+            }
+        }
+
+        return vector;
     }
 
     /**
