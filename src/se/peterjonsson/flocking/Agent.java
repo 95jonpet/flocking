@@ -61,6 +61,11 @@ class Agent {
     private Vector2D direction;
 
     /**
+     * Gets if the agent is dead.
+     */
+    private boolean dead;
+
+    /**
      * The color to use when drawing the agent.
      */
     private static Color color = Color.BLUE;
@@ -239,7 +244,7 @@ class Agent {
             Vector2D restraintVector = new Vector2D(
                     FlockingSimulation.SIZE / 2 - getX(),
                     FlockingSimulation.SIZE / 2 - getY()
-            ).normalize().times(0.25);
+            ).normalize().times(0.3);
             resultant = resultant.plus(restraintVector);
         }
 
@@ -269,9 +274,16 @@ class Agent {
      * Kills the agent.
      * This removes it from the shared list of agents.
      */
-    @SuppressWarnings("unused")
-    public void kill() {
-        agents.remove(this);
+    void kill() {
+        dead = true;
+    }
+
+    /**
+     * Gets if the agent is dead or not.
+     * @return Agent is dead.
+     */
+    boolean isDead() {
+        return dead;
     }
 
     /**

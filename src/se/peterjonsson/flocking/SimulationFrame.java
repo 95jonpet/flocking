@@ -14,16 +14,18 @@ class SimulationFrame {
     private final int number;
     private final List<Position> agents;
     private final List<Position> obstacles;
+    private final List<Position> predators;
 
     /**
      * Creates a new simulation frame from an existing state.
      * @param number Step number in the simulation.
      * @param agents List of agents in their state to take a snapshot of.
      */
-    SimulationFrame(final int number, final List<Position> agents, final List<Position> obstacles) {
+    SimulationFrame(int number, List<Position> agents, List<Position> obstacles, List<Position> predators) {
         this.number = number;
         this.agents = agents;
         this.obstacles = obstacles;
+        this.predators = predators;
     }
 
     /**
@@ -48,6 +50,11 @@ class SimulationFrame {
         // Render all agents.
         for (Position agent : agents) {
             Agent.render(agent, graphics);
+        }
+
+        // Render all predators.
+        for (Position predator : predators) {
+            Predator.render(predator, graphics);
         }
 
         graphics.dispose();

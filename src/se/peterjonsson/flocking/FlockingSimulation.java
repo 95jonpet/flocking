@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ class FlockingSimulation {
     /**
      * The number of steps to simulate.
      */
-    static final int STEPS = 1000;
+    static final int STEPS = 5000;
 
     /**
      * List of all agents within the simulation.
@@ -35,6 +36,11 @@ class FlockingSimulation {
      * List of obstacles.
      */
     private final List<Obstacle> obstacles;
+
+    /**
+     * List of predators.
+     */
+    private final List<Predator> predators;
 
     /**
      * Indicates if the simulation has finished or not.
@@ -63,8 +69,10 @@ class FlockingSimulation {
     FlockingSimulation(final int numberOfAgents) {
         this.agents = new ArrayList<>();
         obstacles = new ArrayList<>();
+        predators = new ArrayList<>();
 
-        obstacles.add(new Obstacle(SIZE / 2, SIZE / 2));
+        //obstacles.add(new Obstacle(SIZE / 2, SIZE / 2));
+        predators.add(new Predator(SIZE / 2, SIZE / 2, agents, obstacles, predators));
 
         // Set up initial state
         // TODO Make more effective
@@ -108,7 +116,12 @@ class FlockingSimulation {
                 obstacleList.add(new Position(obstacle.x, obstacle.y));
             }
 
-            frame[i] = new SimulationFrame(i, agentList, obstacleList);
+            List<Position> predatorList = new LinkedList<>();
+            for (Predator predator : predators) {
+                predatorList.add(new Position(predator.getX(), predator.getY(), predator.getAngle()));
+            }
+
+            frame[i] = new SimulationFrame(i, agentList, obstacleList, predatorList);
 
             progressProperty.set((double) i / STEPS);
         }
@@ -126,6 +139,13 @@ class FlockingSimulation {
         for (Agent agent : agents) {
             agent.update();
         }
+
+        for (Predator predator : predators) {
+            predator.update();
+        }
+
+        agents.removeIf(Agent::isDead); // Remove killed agents
+        System.out.printf("%d agents alive.\n", agents.size());
     }
 
     /**
