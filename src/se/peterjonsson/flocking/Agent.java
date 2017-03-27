@@ -13,6 +13,8 @@ import java.util.List;
  */
 class Agent {
 
+    private static final boolean FLOCKING = true;
+
     /**
      * Distance the agent moves in one step/update.
      */
@@ -99,7 +101,7 @@ class Agent {
         this.predators = predators;
 
         position = new Vector2D(x, y);
-        direction = new Vector2D(x, y).normalize();
+        direction = new Vector2D(FlockingSimulation.SIZE / 2 - x, FlockingSimulation.SIZE / 2 - y).normalize();
     }
 
     /**
@@ -276,14 +278,19 @@ class Agent {
         Vector2D resultant = direction;
 
         resultant = resultant.plus(separationVector().times(3));
-        resultant = resultant.plus(alignmentVector());
-        resultant = resultant.plus(cohesionVector());
 
-        if (distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2) >= FlockingSimulation.SIZE * (2.0 / 6.0)) {
+        if (FLOCKING) {
+            resultant = resultant.plus(alignmentVector());
+            resultant = resultant.plus(cohesionVector());
+        }
+
+        double distance = distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2);
+        if (distance >= FlockingSimulation.SIZE / 2) {
+            double restraintForce = (distance / (FlockingSimulation.SIZE / 2)) - 1;
             Vector2D restraintVector = new Vector2D(
                     FlockingSimulation.SIZE / 2 - getX(),
                     FlockingSimulation.SIZE / 2 - getY()
-            ).normalize().times(0.3);
+            ).normalize().times(restraintForce);
             resultant = resultant.plus(restraintVector);
         }
 

@@ -1,5 +1,6 @@
 out/
 temp/
 simulations/
+result.txt
 .idea/artifacts/
 .idea/inspectionProfiles/

@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 class Predator {
+    private static final boolean FLOCKING = false;
+
     /**
      * Distance the agent moves in one step/update.
      */
@@ -60,6 +62,28 @@ class Predator {
     private static final int[] yPoints = new int[] { 15, 0, 15 };
 
     /**
+     * Maximum distance to apply alignment force to.
+     */
+    private static final int MAX_ALIGNMENT_DISTANCE = 128 / 2;
+
+    /**
+     * Minimum distance to apply cohesion force to.
+     */
+    private static final int MIN_COHESION_DISTANCE = 16;
+
+    /**
+     * Maximum distance to apply cohesion force to.
+     */
+    private static final int MAX_COHESION_DISTANCE = 64;
+
+    /**
+     * Maximum distance to apply separation force to.
+     */
+    private static final int MAX_SEPARATION_DISTANCE = 16;
+
+    private static final int FIELD_OF_VIEW_DEGREES = 140;
+
+    /**
      * Creates a new predator.
      * @param x Horizontal position.
      * @param y Vertical position.
@@ -73,30 +97,42 @@ class Predator {
         this.predators = predators;
 
         position = new Vector2D(x, y);
-        direction = new Vector2D(x, y).normalize();
+        direction = new Vector2D(FlockingSimulation.SIZE / 2 - x, FlockingSimulation.SIZE / 2 - y).normalize();
     }
 
     /**
      * Updates the predator by stepping forward one step of the simulation.
      */
     void update() {
-        Vector2D resultant = direction;
+        Vector2D resultant = boidsVector().normalize(); // General boids vector
 
         if (agents.size() != 0) {
             double shortestDistance = Double.MAX_VALUE;
             Iterator<Agent> iterator = agents.iterator();
-            Agent closestAgent = iterator.next();
+            Agent closestAgent = null;
             while (iterator.hasNext()) {
                 Agent agent = iterator.next();
                 double distance = distanceToAgent(agent);
-                if (distance < shortestDistance) {
+
+                Vector2D vToAgent = new Vector2D(agent.getX() - getX(), agent.getY() - getY());
+                double diffAngle = (Math.atan2(vToAgent.y(),vToAgent.x()) - Math.atan2(direction.y(),direction.x()));
+
+                if (diffAngle > Math.PI) {
+                    diffAngle -= Math.PI;
+                }
+
+                boolean validAngle = diffAngle <= Math.toRadians(FIELD_OF_VIEW_DEGREES);
+
+                if (distance < shortestDistance && validAngle) {
                     shortestDistance = distance;
                     closestAgent = agent;
                 }
             }
 
-            Vector2D vector = new Vector2D(closestAgent.getX() - getX(), closestAgent.getY() - getY());
-            resultant = resultant.plus(vector.normalize().times(0.5));
+            if (closestAgent != null) {
+                Vector2D vector = new Vector2D(closestAgent.getX() - getX(), closestAgent.getY() - getY());
+                resultant = resultant.plus(vector.normalize().times(2));
+            }
         }
 
         resultant = resultant.normalize().times(SPEED); // Normalize
@@ -107,13 +143,119 @@ class Predator {
     }
 
     /**
+     * Gets the boids vector created by the three rules:
+     *  1. Separation
+     *  2. Alignment
+     *  3. Cohesion
+     * The vector is not normalized.
+     * @return Boids vector.
+     */
+    private Vector2D boidsVector() {
+        Vector2D resultant = direction;
+
+        resultant = resultant.plus(separationVector().times(3));
+
+        if (FLOCKING) {
+            resultant = resultant.plus(alignmentVector());
+            resultant = resultant.plus(cohesionVector());
+        }
+
+        double distance = distanceToPoint(FlockingSimulation.SIZE / 2, FlockingSimulation.SIZE / 2);
+        if (distance >= FlockingSimulation.SIZE / 2) {
+            double restraintForce = (distance / (FlockingSimulation.SIZE / 2)) - 1;
+            Vector2D restraintVector = new Vector2D(
+                    FlockingSimulation.SIZE / 2 - getX(),
+                    FlockingSimulation.SIZE / 2 - getY()
+            ).normalize().times(restraintForce);
+            resultant = resultant.plus(restraintVector);
+        }
+
+        return resultant;
+    }
+
+    /**
+     * Gets a normalized vector pointing toward the middle of the flock.
+     * @return Normalized vector toward flock center.
+     */
+    private Vector2D cohesionVector() {
+        Vector2D cohesion = new Vector2D();
+
+        for (Predator predator : predators) {
+            double distance = distanceToPredator(predator);
+            if (predator != this && distance >= MIN_COHESION_DISTANCE && distance <= MAX_COHESION_DISTANCE) {
+                cohesion = cohesion.plus(new Vector2D(predator.getX() - getX(), predator.getY() - getY()));
+            }
+        }
+
+        if (cohesion.x() != 0 && cohesion.y() != 0) {
+            cohesion = cohesion.normalize();
+        }
+
+        return cohesion;
+    }
+
+    /**
+     * Gets a normalized vector representing the general direction of all nearby agents.
+     * @return Normalized vector representing general agent direction.
+     */
+    private Vector2D alignmentVector() {
+        Vector2D generalDirection = new Vector2D();
+
+        for (Predator predator : predators) {
+            if (predator != this && distanceToPredator(predator) <= MAX_ALIGNMENT_DISTANCE) {
+                generalDirection = generalDirection.plus(predator.direction);
+            }
+        }
+
+        return generalDirection.normalize();
+    }
+
+    /**
+     * Gets a normalized vector pointing away from the the closest agent.
+     * If there is no agent in close proximity, a zero-vector will be returned instead.
+     * @return Normalized vector pointing away from the closest agent.
+     */
+    private Vector2D separationVector() {
+        Vector2D separation = new Vector2D(0, 0);
+
+        for (Predator predator : predators) {
+            if (predator != this && distanceToPredator(predator) <= MAX_SEPARATION_DISTANCE) {
+                separation = separation.plus(new Vector2D(getX() - predator.getX(), getY() - predator.getY()));
+            }
+        }
+
+        if (separation.x() != 0 && separation.y() != 0) {
+            separation = separation.normalize();
+        }
+
+        return separation;
+    }
+
+    /**
+     * Gets the distance to another {@link Agent}.
+     * @param predator Other agent.
+     * @return Distance to the specified agent.
+     */
+    private double distanceToPredator(Predator predator) {
+        return distanceToPoint(predator.getX(), predator.getY());
+    }
+
+    /**
      * Kills all nearby agents.
      */
     private void killNearbyAgents() {
+        Agent closestAgent = null;
+        double distance = Double.MAX_VALUE;
+
         for (Agent agent : agents) {
-            if (distanceToAgent(agent) < KILL_DISTANCE) {
-                agent.kill();
+            if (distanceToAgent(agent) < distance && !agent.isDead()) {
+                closestAgent = agent;
+                distance = distanceToAgent(agent);
             }
+        }
+
+        if (closestAgent != null && distance <= KILL_DISTANCE) {
+            closestAgent.kill();
         }
     }
 

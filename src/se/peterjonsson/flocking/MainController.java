@@ -1,19 +1,9 @@
 package se.peterjonsson.flocking;
 
 import javafx.scene.Parent;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.stream.Stream;
-
 /**
  * Controller for the main view.
  */
@@ -35,7 +25,7 @@ class MainController {
     MainController(Parent root) {
         imageView = (ImageView) root.lookup("#imageView");
 
-        simulation = new FlockingSimulation(42);
+        simulation = new FlockingSimulation(100);
 
         Slider slider = (Slider) root.lookup("#slider");
         slider.setMin(0);
@@ -45,28 +35,6 @@ class MainController {
             Image img = simulation.getFrame((int) Math.floor((double) newValue)).getImage();
             imageView.setImage(img);
         });
-
-        @SuppressWarnings("unchecked")
-        ListView<Path> sidebar = (ListView<Path>) root.lookup("#sidebar");
-
-        try {
-            if (Files.notExists(FileSystems.getDefault().getPath("simulations"))) {
-                Files.createDirectory(FileSystems.getDefault().getPath("simulations"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try (Stream<Path> stream = Files.list(FileSystems.getDefault().getPath("simulations"))) {
-            Iterator<Path> iterator = stream.iterator();
-            while (iterator.hasNext()) {
-                sidebar.getItems().add(iterator.next());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        sidebar.getItems().sort(Comparator.naturalOrder());
 
         new SimulationDialog(simulation);
     }

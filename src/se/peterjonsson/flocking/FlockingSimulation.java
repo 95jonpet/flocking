@@ -3,10 +3,13 @@ package se.peterjonsson.flocking;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * A flocking simulation.
@@ -20,7 +23,7 @@ class FlockingSimulation {
     /**
      * The horizontal and vertical size of the simulation.
      */
-    static final int SIZE = 512;
+    static final int SIZE = 2048;
 
     /**
      * The number of steps to simulate.
@@ -63,18 +66,14 @@ class FlockingSimulation {
      */
     final DoubleProperty progressProperty = new SimpleDoubleProperty(0);
 
+    private static final Random random = new Random(-8795449841720952236L); // Randomized seed
+
     /**
      * Creates a new flocking simulation.
      */
     FlockingSimulation(final int numberOfAgents) {
-        //addObstacle(SIZE / 2, SIZE / 2);
-        addPredator(SIZE / 2, SIZE / 2);
-
-        // Set up initial state
-        // TODO Make more effective
         for (int i = 0; i < numberOfAgents; i++) {
-            int position = (int) Math.floor(i * (Math.pow(SIZE, 2) / numberOfAgents));
-            addAgent(position / SIZE, position % SIZE);
+            addAgent(random.nextInt(SIZE), random.nextInt(SIZE));
         }
     }
 
@@ -98,28 +97,44 @@ class FlockingSimulation {
         running = true;
         progressProperty.set(0);
 
-        // Simulate steps as frames
-        for (int i = 0; i < STEPS; i++) {
-            update();
+        Path path = Paths.get("result.txt");
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            List<Position> agentList = new LinkedList<>();
-            for (Agent agent : agents) {
-                agentList.add(new Position(agent.getX(), agent.getY(), agent.getAngle()));
+        try (BufferedWriter out = Files.newBufferedWriter(path, Charset.defaultCharset())) {
+            // Simulate steps as frames
+            for (int i = 0; i < STEPS; i++) {
+                if (i > 0) {
+                    update(i);
+                }
+
+                List<Position> agentList = new LinkedList<>();
+                for (Agent agent : agents) {
+                    agentList.add(new Position(agent.getX(), agent.getY(), agent.getAngle()));
+                }
+
+                List<Position> obstacleList = new LinkedList<>();
+                for (Obstacle obstacle : obstacles) {
+                    obstacleList.add(new Position(obstacle.x, obstacle.y));
+                }
+
+                List<Position> predatorList = new LinkedList<>();
+                for (Predator predator : predators) {
+                    predatorList.add(new Position(predator.getX(), predator.getY(), predator.getAngle()));
+                }
+
+                frame[i] = new SimulationFrame(i, agentList, obstacleList, predatorList);
+
+                progressProperty.set((double) i / STEPS);
+
+                out.write(""+agents.size());
+                out.newLine();
             }
-
-            List<Position> obstacleList = new LinkedList<>();
-            for (Obstacle obstacle : obstacles) {
-                obstacleList.add(new Position(obstacle.x, obstacle.y));
-            }
-
-            List<Position> predatorList = new LinkedList<>();
-            for (Predator predator : predators) {
-                predatorList.add(new Position(predator.getX(), predator.getY(), predator.getAngle()));
-            }
-
-            frame[i] = new SimulationFrame(i, agentList, obstacleList, predatorList);
-
-            progressProperty.set((double) i / STEPS);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         IMAGE_WRITER.waitForImages();
@@ -131,7 +146,11 @@ class FlockingSimulation {
     /**
      * Updates the simulation by stepping forward once.
      */
-    private void update() {
+    private void update(int step) {
+        if (step == 1000) {
+            releasePredators();
+        }
+
         for (Agent agent : agents) {
             agent.update();
         }
@@ -141,7 +160,6 @@ class FlockingSimulation {
         }
 
         agents.removeIf(Agent::isDead); // Remove killed agents
-        System.out.printf("%d agents alive.\n", agents.size());
     }
 
     /**
@@ -169,5 +187,14 @@ class FlockingSimulation {
      */
     private void addPredator(int x, int y) {
         predators.add(new Predator(x, y, agents, obstacles, predators));
+    }
+
+    private void releasePredators() {
+        int d = 16;
+
+        addPredator(SIZE / 2 - d, SIZE / 2 - d);
+        addPredator(SIZE / 2 + d, SIZE / 2 - d);
+        addPredator(SIZE / 2 - d, SIZE / 2 + d);
+        addPredator(SIZE / 2 + d, SIZE / 2 + d);
     }
 }

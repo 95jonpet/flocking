@@ -33,12 +33,13 @@ class SimulationFrame {
      * @return Frame image.
      */
     javafx.scene.image.Image getImage() {
-        final BufferedImage image = new BufferedImage(FlockingSimulation.SIZE, FlockingSimulation.SIZE, BufferedImage.TYPE_INT_RGB);
+        final int e = 2;
+        final BufferedImage image = new BufferedImage(FlockingSimulation.SIZE * e, FlockingSimulation.SIZE * e, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
         // Clear graphics
         graphics.setColor(Color.WHITE);
-        graphics.fillRect(0, 0, FlockingSimulation.SIZE, FlockingSimulation.SIZE);
+        graphics.fillRect(0, 0, FlockingSimulation.SIZE * e, FlockingSimulation.SIZE * e);
 
         graphics.setColor(Color.BLUE); // Render agents in blue
 
