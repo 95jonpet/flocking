@@ -13,7 +13,7 @@ import java.util.List;
  */
 class Agent {
 
-    private static final boolean FLOCKING = true;
+    private static final boolean FLOCKING = FlockingSimulation.FLOCKING_PREY;
 
     /**
      * Distance the agent moves in one step/update.

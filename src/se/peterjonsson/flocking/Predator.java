@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 class Predator {
-    private static final boolean FLOCKING = false;
+    private static final boolean FLOCKING = FlockingSimulation.FLOCKING_PREDATORS;
 
     /**
      * Distance the agent moves in one step/update.
@@ -121,7 +121,7 @@ class Predator {
                     diffAngle -= Math.PI;
                 }
 
-                boolean validAngle = diffAngle <= Math.toRadians(FIELD_OF_VIEW_DEGREES);
+                boolean validAngle = diffAngle <= Math.toRadians(FIELD_OF_VIEW_DEGREES / 2);
 
                 if (distance < shortestDistance && validAngle) {
                     shortestDistance = distance;

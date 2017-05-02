@@ -18,7 +18,16 @@ import java.util.*;
  */
 class FlockingSimulation {
 
-    static final CustomImageWriter IMAGE_WRITER = new CustomImageWriter();
+    static final boolean FLOCKING_PREY = true;
+    static final boolean FLOCKING_PREDATORS = true;
+    //private static final Random random = new Random(861178936920257679L); // Randomized seed
+
+//    private static final Random random = new Random(766104113L);
+//    private static final Random random = new Random(965935330L);
+//    private static final Random random = new Random(187436842L);
+//    private static final Random random = new Random(696054169L);
+    private static final Random random = new Random(-915743478L);
+
 
     /**
      * The horizontal and vertical size of the simulation.
@@ -65,8 +74,6 @@ class FlockingSimulation {
      * The value is between 0 and 1 inclusive.
      */
     final DoubleProperty progressProperty = new SimpleDoubleProperty(0);
-
-    private static final Random random = new Random(-8795449841720952236L); // Randomized seed
 
     /**
      * Creates a new flocking simulation.
@@ -136,8 +143,6 @@ class FlockingSimulation {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        IMAGE_WRITER.waitForImages();
 
         running = false;
         finished = true;
